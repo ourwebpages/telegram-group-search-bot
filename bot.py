@@ -1,10 +1,12 @@
 import os
 import sqlite3
+import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+logging.basicConfig(level=logging.INFO)
 
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 if not BOT_TOKEN:
     raise RuntimeError("BOT_TOKEN not set")
 
@@ -50,10 +52,15 @@ async def index_group(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         conn.commit()
 
-app = ApplicationBuilder().token(BOT_TOKEN).build()
-app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("search", search))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, index_group))
+def main():
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
 
-print("🤖 Bot running on Railway...")
-app.run_polling()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("search", search))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, index_group))
+
+    print("🤖 Bot started successfully on Railway")
+    app.run_polling()
+
+if __name__ == "__main__":
+    main()
